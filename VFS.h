@@ -18,6 +18,8 @@ using namespace std;
 class VFS {
 
 public:
+    string getCwd();
+
     void init(string* existing);
     void pwd();
     void listDir();

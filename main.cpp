@@ -54,42 +54,82 @@ int main() {
     auto vfs = new VFS();
     //runTests(vfs);
 
+    string command = "";
 
+    while (true) {
+        try {
+            cout << "|vfs| " << vfs->getCwd() << ":";
 
-    /*File files[] = {
-        { 1, "file1", 1, 0, 0, 80 },
-        { 2, "file2", 1, 1, 5, 4096 },
-    };
+            getline(cin, command);
 
-    ofstream testFs("./VFS.dat", ios::binary);
+            if (command == "quit")
+                break;
 
-    testFs.write((char*)files, size(files) * sizeof(File));
-    testFs << '\0';
-    testFs.close();
+            auto args = *split(command, " ");
 
-    ifstream inputFs("./VFS.dat", ios::binary | ios::ate);
-    long long fSize = inputFs.tellg();
-    inputFs.seekg(0);
+            if (args[0] == "init") {
+                if (args.size() > 1) {
+                    vfs->init(&args[1]);
+                }
+                else {
+                    vfs->init(nullptr);
+                }
 
-    char* buffer = new char[fSize];
-    inputFs.read(buffer, fSize);
-    inputFs.close();
+                continue;
+            }
 
-    File** loadedFiles = new File*[fSize / sizeof(File)];
-    int totalFiles = 0;
+            if (args[0] == "save") {
+                vfs->save(args[1]);
+                continue;
+            }
 
-    while (buffer[0] != '\0') {
-        loadedFiles[totalFiles++] = (File*)buffer;
-        buffer = buffer + sizeof(File);
+            if (args[0] == "load") {
+                vfs->load(args[1]);
+                continue;
+            }
+
+            if (args[0] == "pwd") {
+                vfs->pwd();
+                continue;
+            }
+
+            if (args[0] == "ls") {
+                vfs->listDir();
+                continue;
+            }
+
+            if (args[0] == "cd") {
+                vfs->changeDir(args[1]);
+                continue;
+            }
+
+            if (args[0] == "mount") {
+                vfs->mount(args[1], args[2]);
+                continue;
+            }
+
+            if (args[0] == "umount") {
+                vfs->umount(args[1]);
+                continue;
+            }
+
+            if (args[0] == "cp") {
+                vfs->copyFile(args[1], args[2]);
+                continue;
+            }
+
+            if (args[0] == "rename") {
+                vfs->renameFile(args[1], args[2]);
+                continue;
+            }
+
+            if (args[0] == "rm") {
+                vfs->removeFile(args[1]);
+                continue;
+            }
+        }
+        catch(...) {
+            cout << "Error" << endl;
+        }
     }
-
-    *//*while (inputFs.peek() != '\0') {
-        loadedFiles[totalFiles++] = File::readFrom(inputFs);
-    }*//*
-
-    for (int i = 0; i < totalFiles; i++) {
-        printf("%s\n", loadedFiles[i]->name);
-    }
-
-    return 0;*/
 }

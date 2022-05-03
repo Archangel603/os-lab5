@@ -12,7 +12,9 @@ DirectAccessor::DirectAccessor(string path, File* file, vector<File*>* files, un
 }
 
 void DirectAccessor::ensureExists() {
-    if (!getFile(this->_files, this->_file->id)) {
+    auto existing = getFile(this->_files, this->_file->id);
+
+    if (!existing) {
         auto parent = getFile(this->_files, getParentPath(this->path));
 
         if (!parent) {
@@ -43,6 +45,7 @@ char* DirectAccessor::readData() {
 }
 
 void DirectAccessor::rename(string newName) {
+    this->_file->clearName();
     newName.copy(this->_file->name, newName.size());
     this->name = this->_file->name;
 }
@@ -75,15 +78,6 @@ void DirectAccessor::remove() {
         }
     }
 
-    this->_files->erase(
-    std::remove(
-        this->_files->begin(),
-        this->_files->end(),
-            this->_file
-        ),
-    this->_files->end()
-    );
-
-    delete this->_data->at(this->_file->id);
     this->_data->erase(this->_file->id);
+    removeFromVector(this->_files, this->_file);
 }

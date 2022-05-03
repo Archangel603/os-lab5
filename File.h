@@ -8,6 +8,12 @@ struct File {
     long size = 0;
     bool isDir = false;
 
+    void clearName() {
+        for (int i = 0; i < 250; ++i) {
+            this->name[i] = 0;
+        }
+    }
+
     /*void writeTo(std::ostream& s) {
         s.write((char*)&this->id, sizeof(long));
         s.write((char*)&this->parentId, sizeof(long));

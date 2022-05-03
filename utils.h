@@ -7,6 +7,18 @@
 
 using namespace std;
 
+template<typename T>
+void removeFromVector(vector<T>* vec, T item) {
+    vec->erase(
+            std::remove(
+                    vec->begin(),
+                    vec->end(),
+                    item
+            ),
+            vec->end()
+    );
+}
+
 void trimStartPathDelim(string& path);
 
 void trimEndPathDelim(string& path);

@@ -2,8 +2,13 @@
 
 using namespace std;
 
+string VFS::getCwd() {
+    return this->_currentDir;
+}
+
 void VFS::init(string *existing) {
     if (existing != nullptr) {
+        this->load(*existing);
         return;
     }
 
@@ -11,21 +16,25 @@ void VFS::init(string *existing) {
         1, "", 0, 0, true
     });
     this->_files->push_back(new File {
-        2, "file1.sh", 1,  5, false
+        2, "file1.sh", 1,  0, false
     });
     this->_files->push_back(new File {
-        3, "doc.txt", 1,  5, false
+        3, "doc.txt", 1,  0, false
     });
     this->_files->push_back(new File {
-        4, "dir1", 1,  5, true
+        4, "dir1", 1,  0, true
     });
     this->_files->push_back(new File {
-        5, "dz.docx", 4,  5, false
+        5, "dz.docx", 4,  0, false
     });
     this->_files->push_back(new File {
-        6, "another_dir", 4, 5, true
+        6, "another_dir", 4, 0, true
     });
     this->_idGen = 7;
+
+    this->writeToFile("file1.sh", "echo \"Hello, world!\"");
+    this->writeToFile("doc.txt", "<You can see here a recipe of very tasty waffles>");
+    this->writeToFile("/dir1/dz.docx", "Nasty document");
 }
 
 void VFS::pwd() {
@@ -119,25 +128,8 @@ void VFS::umount(string mountPath) {
         return;
     }
 
-    auto file = getFile(this->_files, mountPath);
-
-    this->_files->erase(
-        std::remove(
-                this->_files->begin(),
-                this->_files->end(),
-                file
-        ),
-        this->_files->end()
-    );
-
-    this->_mounts->erase(
-            std::remove(
-                    this->_mounts->begin(),
-                    this->_mounts->end(),
-                    externalAccessor->mount
-            ),
-            this->_mounts->end()
-    );
+    removeFromVector(this->_files, getFile(this->_files, fullPath));
+    removeFromVector(this->_mounts, externalAccessor->mount);
 
     delete externalAccessor;
 }
@@ -193,11 +185,62 @@ void VFS::removeFile(string path) {
 }
 
 void VFS::save(string &realPath) {
+    if (this->_mounts->size() > 0) {
+        cout << "Please unmount all dirs before save" << endl;
+        return;
+    }
 
+    ofstream f(realPath, ios::binary);
+
+    for (auto file : *this->_files) {
+        f.write((char*)file, sizeof(File));
+    }
+
+    f.write("\0", 1);
+
+    for (auto el : *this->_data) {
+        auto file = getFile(this->_files, el.first);
+        f.write((char*)&el.first, sizeof(long));
+        f.write(el.second, file->size);
+    }
+
+    f.close();
+    cout << "Saved vfs" << endl;
 }
 
 void VFS::load(string &realPath) {
+    this->_files->clear();
+    this->_data->clear();
 
+    ifstream inputFs(realPath, ios::binary | ios::ate);
+    long long fSize = inputFs.tellg();
+    inputFs.seekg(0);
+
+    char* buffer = new char[fSize];
+    char* end = buffer + fSize;
+    inputFs.read(buffer, fSize);
+    inputFs.close();
+
+    while (buffer[0] != '\0') {
+        auto file = (File*)buffer;
+        this->_files->push_back(file);
+        buffer = buffer + sizeof(File);
+        this->_idGen = file->id + 1;
+    }
+
+    buffer++;
+
+    while (buffer != end) {
+        auto fileId = *(long*)buffer;
+        buffer += sizeof(long);
+
+        auto file = getFile(this->_files, fileId);
+
+        (*this->_data)[fileId] = buffer;
+        buffer += file->size;
+    }
+
+    cout << "Loaded vfs" << endl;
 }
 
 FileAccessor* VFS::getAccessor(string& path, bool isDir) {
