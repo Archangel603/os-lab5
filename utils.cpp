@@ -112,20 +112,3 @@ File* getFile(vector<File*>* files, string path) {
 
     return result;
 }
-
-string buildPath(vector<File*>* files, File* file) {
-    string result = "";
-
-    File* current = file;
-
-    while (current != nullptr) {
-        result = joinPath(current->name, result);
-        current = getFile(files, current->parentId);
-    }
-
-    if (result != "/") {
-        trimEndPathDelim(result);
-    }
-
-    return result;
-}

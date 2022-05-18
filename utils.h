@@ -39,6 +39,4 @@ File* getFile(vector<File*>* files, long id);
 
 File* getFile(vector<File*>* files, string path);
 
-string buildPath(vector<File*>* files, File* file);
-
 #endif //LAB5_UTILS_H

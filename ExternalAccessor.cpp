@@ -49,7 +49,7 @@ void ExternalAccessor::rename(string newName) {
     auto parentDir = getParentPath(this->_realPath);
     auto newPath = joinPath(parentDir, newName);
 
-    filesystem::rename(this->_realPath, newName);
+    filesystem::rename(this->_realPath, newPath);
 }
 
 void ExternalAccessor::copyTo(FileAccessor* target) {
