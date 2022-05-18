@@ -21,7 +21,7 @@ class ExternalAccessor : public FileAccessor {
 public:
     Mount* mount;
 
-    ExternalAccessor(string relativePath, Mount* mount);
+    ExternalAccessor(string relativePath, Mount* mount, bool isDir);
 
     void ensureExists() override;
 

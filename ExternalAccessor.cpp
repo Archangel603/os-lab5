@@ -2,10 +2,11 @@
 
 using namespace std;
 
-ExternalAccessor::ExternalAccessor(string relativePath, Mount* mount) {
+ExternalAccessor::ExternalAccessor(string relativePath, Mount* mount, bool isDir) {
     this->mount = mount;
     this->path = joinPath(mount->mountPath, relativePath);
     this->_realPath = joinPath(mount->realFsPath, relativePath);
+    this->isDir = isDir;
 }
 
 void ExternalAccessor::ensureExists() {

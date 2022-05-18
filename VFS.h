@@ -45,10 +45,10 @@ private:
     unordered_map<long, char*>* _data  = new unordered_map<long, char*>();
     string _currentDir = "/";
 
-    FileAccessor* getAccessor(string& path, bool isDir);
+    unique_ptr<FileAccessor> getAccessor(string& path, bool isDir);
     long getNextId();
     string toFullPath(string path);
-    ExternalAccessor* tryGetExternalAccessor(string& path);
+    unique_ptr<ExternalAccessor> tryGetExternalAccessor(string& path);
 };
 
 

@@ -1,9 +1,9 @@
-//
-// Created by mikha on 03.05.2022.
-//
-
 #ifndef LAB5_MOUNT_H
 #define LAB5_MOUNT_H
+
+#include "string"
+
+using namespace std;
 
 struct Mount {
     string mountPath;

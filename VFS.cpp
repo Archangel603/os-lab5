@@ -130,8 +130,6 @@ void VFS::umount(string mountPath) {
 
     removeFromVector(this->_files, getFile(this->_files, fullPath));
     removeFromVector(this->_mounts, externalAccessor->mount);
-
-    delete externalAccessor;
 }
 
 void VFS::writeToFile(string path, string content) {
@@ -168,7 +166,7 @@ void VFS::copyFile(string srcPath, string dstPath) {
     auto source = this->getAccessor(srcPath, false);
     auto target = this->getAccessor(dstPath, false);
 
-    source->copyTo(target);
+    source->copyTo(target.get());
 }
 
 void VFS::removeFile(string path) {
@@ -243,7 +241,7 @@ void VFS::load(string &realPath) {
     cout << "Loaded vfs" << endl;
 }
 
-FileAccessor* VFS::getAccessor(string& path, bool isDir) {
+unique_ptr<FileAccessor> VFS::getAccessor(string& path, bool isDir) {
     auto externalAccessor = tryGetExternalAccessor(path);
 
     if (externalAccessor)
@@ -260,7 +258,7 @@ FileAccessor* VFS::getAccessor(string& path, bool isDir) {
         file->isDir = isDir;
     }
 
-    return new DirectAccessor(path, file, this->_files, this->_data);
+    return std::make_unique<DirectAccessor>(path, file, this->_files, this->_data);
 }
 
 long VFS::getNextId() {
@@ -275,13 +273,13 @@ string VFS::toFullPath(string path) {
     return path;
 }
 
-ExternalAccessor* VFS::tryGetExternalAccessor(string& path) {
+unique_ptr<ExternalAccessor> VFS::tryGetExternalAccessor(string& path) {
     for (auto mount : *this->_mounts) {
         if (path.rfind(mount->mountPath, 0) == 0) {
             auto size = mount->mountPath.size();
             auto internalPath = path.substr(size, path.size() - size);
 
-            return new ExternalAccessor(internalPath, mount);
+            return std::make_unique<ExternalAccessor>(internalPath, mount, true);
         }
     }
 
